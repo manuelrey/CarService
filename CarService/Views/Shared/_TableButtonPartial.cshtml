@@ -10,7 +10,8 @@
               Glyphicon = "pencil",
               Text = "Edit Button",
               ServiceId = Model.ServiceId,
-              CustomerId = Model.CustomerId
+              CustomerId = Model.CustomerId,
+              CarId=Model.CarId
           })
 
         @Html.Partial("_IndividualButtonPartial",
@@ -21,7 +22,8 @@
               Glyphicon = "list",
               Text = "Details Button",
               ServiceId = Model.ServiceId,
-              CustomerId = Model.CustomerId
+              CustomerId = Model.CustomerId,
+              CarId = Model.CarId
           })
 
         @Html.Partial("_IndividualButtonPartial",
@@ -32,7 +34,8 @@
              Glyphicon = "trash",
              Text = "Delete Button",
              ServiceId = Model.ServiceId,
-             CustomerId = Model.CustomerId
+             CustomerId = Model.CustomerId,
+             CarId = Model.CarId
          })
     </div>
 </td>

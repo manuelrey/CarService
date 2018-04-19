@@ -16,6 +16,7 @@ namespace CarService.Data
         }
 
         public DbSet<ServiceType> ServiceType { get; set; }
+        public DbSet<Car> Cars { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
