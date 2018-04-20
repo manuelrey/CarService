@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using CarService.Data;
 using CarService.Models;
+using CarService.Utility;
 using CarService.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +21,7 @@ namespace CarService.Controllers
             _db = db;
         }
 
+        [Authorize]
         public IActionResult Index(int carId)
         {
             var car = _db.Cars.FirstOrDefault(c => c.Id == carId);
@@ -38,6 +41,7 @@ namespace CarService.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = SD.AdminEndUser)]
         //GET : Services/Create
         public IActionResult Create(int carId)
         {
@@ -58,6 +62,7 @@ namespace CarService.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = SD.AdminEndUser)]
         //POST : Services/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -90,6 +95,7 @@ namespace CarService.Controllers
 
         }
 
+        [Authorize(Roles = SD.AdminEndUser)]
         //DELETE GET
         public async Task<IActionResult> Delete(int? id)
         {
@@ -109,6 +115,7 @@ namespace CarService.Controllers
             return View(service);
         }
 
+        [Authorize(Roles = SD.AdminEndUser)]
         //POST Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

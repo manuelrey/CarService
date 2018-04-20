@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using CarService.Models;
 using CarService.Models.ManageViewModels;
 using CarService.Services;
+using CarService.Data;
 
 namespace CarService.Controllers
 {
@@ -22,16 +23,19 @@ namespace CarService.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+
+
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
-
+        private readonly ApplicationDbContext _db;
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
         private const string RecoveryCodesKey = nameof(RecoveryCodesKey);
 
         public ManageController(
           UserManager<ApplicationUser> userManager,
           SignInManager<ApplicationUser> signInManager,
+          ApplicationDbContext db,
           IEmailSender emailSender,
           ILogger<ManageController> logger,
           UrlEncoder urlEncoder)
@@ -40,6 +44,7 @@ namespace CarService.Controllers
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+            _db = db;
             _urlEncoder = urlEncoder;
         }
 
@@ -61,7 +66,12 @@ namespace CarService.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 IsEmailConfirmed = user.EmailConfirmed,
-                StatusMessage = StatusMessage
+                StatusMessage = StatusMessage,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Address = user.LastName,
+                City = user.City,
+                PostalCode = user.PostalCode
             };
 
             return View(model);
@@ -82,25 +92,15 @@ namespace CarService.Controllers
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var email = user.Email;
-            if (model.Email != email)
-            {
-                var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
-                if (!setEmailResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting email for user with ID '{user.Id}'.");
-                }
-            }
+            var userInDb = _db.Users.Where(u => u.Email.Equals(model.Email)).FirstOrDefault();
+            userInDb.FirstName = model.FirstName;
+            userInDb.LastName = model.LastName;
+            userInDb.Address = model.Address;
+            userInDb.City = model.City;
+            userInDb.PhoneNumber = model.PhoneNumber;
+            userInDb.PostalCode = model.PostalCode;
 
-            var phoneNumber = user.PhoneNumber;
-            if (model.PhoneNumber != phoneNumber)
-            {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
-                }
-            }
+            await _db.SaveChangesAsync();
 
             StatusMessage = "Your profile has been updated";
             return RedirectToAction(nameof(Index));

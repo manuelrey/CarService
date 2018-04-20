@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 using CarService.Data;
 using CarService.Models;
 using CarService.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarService.Controllers
 {
+    [Authorize]
     public class CarsController : Controller
     {
-
         private readonly ApplicationDbContext _db;
 
         public CarsController(ApplicationDbContext db)
